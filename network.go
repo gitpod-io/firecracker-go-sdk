@@ -43,7 +43,7 @@ const (
 // configured to use.
 type NetworkInterfaces []NetworkInterface
 
-func (networkInterfaces NetworkInterfaces) validate(kernelArgs kernelArgs) error {
+func (networkInterfaces NetworkInterfaces) validate(kernelArgs *kernelArgs) error {
 	for _, iface := range networkInterfaces {
 		hasCNI := iface.CNIConfiguration != nil
 		hasStaticInterface := iface.StaticConfiguration != nil
@@ -69,7 +69,7 @@ func (networkInterfaces NetworkInterfaces) validate(kernelArgs kernelArgs) error
 				return fmt.Errorf("cannot specify CNIConfiguration or IPConfiguration when multiple network interfaces are provided: %+v", networkInterfaces)
 			}
 
-			if argVal, ok := kernelArgs["ip"]; ok {
+			if argVal := kernelArgs.GetValue("ip"); argVal != nil {
 				return fmt.Errorf(`CNIConfiguration or IPConfiguration cannot be specified when "ip=" provided in kernel boot args, value found: "%v"`, argVal)
 			}
 		}

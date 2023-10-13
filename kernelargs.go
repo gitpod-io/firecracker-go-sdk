@@ -15,30 +15,25 @@ package firecracker
 
 import "strings"
 
-// kernelArgs serializes+deserializes kernel boot parameters from/into a map.
+// kernelArgs serializes+deserializes kernel boot parameters.
 // Kernel docs: https://www.kernel.org/doc/Documentation/admin-guide/kernel-parameters.txt
-//
-// "key=value" will result in map["key"] = &"value"
-// "key=" will result in map["key"] = &""
-// "key" will result in map["key"] = nil
-type kernelArgs map[string]*string
+type kernelArgs struct {
+	parsed   map[string]*string
+	original string
+}
 
 // serialize the kernelArgs back to a string that can be provided
 // to the kernel
 func (kargs kernelArgs) String() string {
-	var fields []string
-	for key, value := range kargs {
-		field := key
-		if value != nil {
-			field += "=" + *value
-		}
-		fields = append(fields, field)
-	}
-	return strings.Join(fields, " ")
+	return kargs.original
+}
+
+func (kargs *kernelArgs) GetValue(key string) *string {
+	return kargs.parsed[key]
 }
 
 // deserialize the provided string to a kernelArgs map
-func parseKernelArgs(rawString string) kernelArgs {
+func parseKernelArgs(rawString string) *kernelArgs {
 	argMap := make(map[string]*string)
 	for _, kv := range strings.Fields(rawString) {
 		// only split into up to 2 fields (before and after the first "=")
@@ -54,5 +49,8 @@ func parseKernelArgs(rawString string) kernelArgs {
 		argMap[key] = value
 	}
 
-	return argMap
+	return &kernelArgs{
+		argMap,
+		rawString,
+	}
 }
