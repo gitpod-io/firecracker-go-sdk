@@ -169,6 +169,8 @@ type Config struct {
 
 	// Configuration for snapshot loading
 	Snapshot SnapshotConfig
+
+	Entropy *models.EntropyDevice
 }
 
 func (cfg *Config) hasSnapshot() bool {
@@ -1252,4 +1254,15 @@ func (m *Machine) UpdateBalloonStats(ctx context.Context, statsPollingIntervals 
 
 	m.logger.Debug("UpdateBalloonStats successful")
 	return nil
+}
+
+func (m *Machine) setupEntropy(ctx context.Context, device *models.EntropyDevice) error {
+	_, err := m.client.PutEntropyDevice(ctx, device)
+	if err != nil {
+		return err
+	}
+
+	m.logger.Debugf("entropy device configured")
+
+	return err
 }

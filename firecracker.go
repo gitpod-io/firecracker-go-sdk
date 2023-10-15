@@ -519,3 +519,11 @@ func (f *Client) GetExportVMConfig(opts ...GetExportVMConfigOpt) (*ops.GetExport
 
 	return f.client.Operations.GetExportVMConfig(p)
 }
+
+func (f *Client) PutEntropyDevice(ctx context.Context, config *models.EntropyDevice) (*ops.PutEntropyDeviceNoContent, error) {
+	params := ops.NewPutEntropyDeviceParams()
+	params.SetContext(ctx)
+	params.SetBody(config)
+
+	return f.client.Operations.PutEntropyDevice(params)
+}

@@ -36,6 +36,7 @@ const (
 	SetupKernelArgsHandlerName         = "fcinit.SetupKernelArgs"
 	CreateBalloonHandlerName           = "fcinit.CreateBalloon"
 	LoadSnapshotHandlerName            = "fcinit.LoadSnapshot"
+	SetupEntropyHandlerName            = "fcinit.SetupEntropy"
 
 	ValidateCfgHandlerName             = "validate.Cfg"
 	ValidateJailerCfgHandlerName       = "validate.JailerCfg"
@@ -313,6 +314,7 @@ var defaultFcInitHandlerList = HandlerList{}.Append(
 	CreateNetworkInterfacesHandler,
 	AddVsocksHandler,
 	ConfigMmdsHandler,
+	SetupEntropyHandler,
 )
 
 var loadSnapshotHandlerList = HandlerList{}.Append(
@@ -474,4 +476,16 @@ func (l HandlerList) Run(ctx context.Context, m *Machine) error {
 	}
 
 	return nil
+}
+
+// SetupEntropyHandler is a named handler that will configure the machine entropy
+var SetupEntropyHandler = Handler{
+	Name: SetupEntropyHandlerName,
+	Fn: func(ctx context.Context, m *Machine) error {
+		if m.Cfg.Entropy == nil {
+			return nil
+		}
+
+		return m.setupEntropy(ctx, m.Cfg.Entropy)
+	},
 }
